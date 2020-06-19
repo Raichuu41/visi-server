@@ -8,10 +8,17 @@
         count: Number, use only if want to reduce the dataset to the first n elements. Most time creating a new one is the bedder way
     }
  */
-
+import path from 'path';
 // "/net/hcihome/storage/www-data-login-cv/visiexp/datasets/Wikiart_Elgammal_EQ_style_train.json
 const prodDataSet = [
     {
+        id: '099',
+        name: '2582_sub_wikiarts#500',
+        description: '...',
+        imgPath: path.join(__dirname, '../../images/2582_sub_wikiarts/'),
+        size: 3,
+    },
+/*    {
         id: '001',
         name: 'Wikiart_Elgammal_EQ_style_train',
         description: 'description text missing',
@@ -84,7 +91,7 @@ const prodDataSet = [
         description: 'Cats and cacti',
         imgPath: '/net/hcihome/storage/www-data-login-cv/visiexp/datasets/raw/catcac/imgs',
         size: 1011,
-    },
+    },*/
     // {
     //     id: '009',
     //     name: 'BreakHis_tumor_train',

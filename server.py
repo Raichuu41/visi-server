@@ -12,7 +12,7 @@ from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer       # python 2
 import json
 #from compute_embedding_snack import compute_graph
 import time, threading
-# import requests
+import requests
 from random import uniform
 
 StartTime = time.time()
@@ -300,7 +300,7 @@ class MyHTTPHandler(BaseHTTPRequestHandler):
 
 if __name__ == "__main__":
     # config
-    HOST_NAME = ""
+    HOST_NAME = "localhost"
     PORT_NUMBER = 8000
     try:
         http_server = HTTPServer((HOST_NAME, PORT_NUMBER), MyHTTPHandler)

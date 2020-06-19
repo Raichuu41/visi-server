@@ -35,12 +35,15 @@ const buildDatasets = async (imgSizes) => {
             //  JSON files with nodes
             const jsonFileName = `${datasetName}.json`;
             const jsonFilePath = path.join(
-                '/net/hcihome/storage/www-data-login-cv/visiexp/datasets',
+                __dirname,
+                '../../images/',
                 jsonFileName,
             );
-
+            console.log(jsonFilePath);
             const jsonFile = await fsp.readFile(jsonFilePath);
-            const { nodes } = JSON.parse(jsonFile);
+            console.log(jsonFile.data);
+            const { nodes } = JSON.parse(jsonFile.data);
+            console.log(nodes);
             const sortedNodes = {};
             Object.keys(nodes).forEach((name) => {
                 sortedNodes[nodes[name].idx] = name;
