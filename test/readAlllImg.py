@@ -2,7 +2,7 @@ from os import listdir, path
 import time
 
 
-p = "../images/2582_sub_wikiarts/"
+p = "../images/2582_sub_wikiarts_debug/"
 n = 10
 out = {}
 

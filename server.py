@@ -14,6 +14,7 @@ import json
 import time, threading
 import requests
 from random import uniform
+import os.path as path
 
 StartTime = time.time()
 
@@ -122,8 +123,8 @@ class MyHTTPHandler(BaseHTTPRequestHandler):
             print('Request file: ' + file)
             
         
-            with open(file, 'rb') as file: 
-                self.wfile.write(file.read()) # Read the file and send the contents 
+            with open(path.abspath(path.join(__file__, '../images/2582_sub_wikiarts_debug_out.json')), 'rb') as file:
+                self.wfile.write(file.read()) # Read the file and send the contents
             # self.wfile.write("Hello World !" + filePath)
 
 

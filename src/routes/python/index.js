@@ -1,9 +1,9 @@
-import { Router } from 'express';
+import Router from 'express';
 import fetch from 'node-fetch';
-import { compareAndClean } from '../../util/compareAndClean';
-import buildLabels from '../../util/buildLabels';
-import { getRandomUnusedId } from '../../util/getRandomUnusedId';
-import { pythonApi } from '../../config/pythonApi';
+import { compareAndClean } from '../../util/compareAndClean.js';
+import buildLabels from '../../util/buildLabels.js';
+import { getRandomUnusedId } from '../../util/getRandomUnusedId.js';
+import { pythonApi } from '../../config/pythonApi.js';
 
 const router = Router();
 

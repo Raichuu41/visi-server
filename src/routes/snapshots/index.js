@@ -1,6 +1,6 @@
-import { Router } from 'express';
+import Router from 'express';
 import fetch from 'node-fetch';
-import { pythonApi } from '../../config/pythonApi';
+import { pythonApi } from '../../config/pythonApi.js';
 
 const router = Router();
 

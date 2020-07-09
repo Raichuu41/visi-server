@@ -1,9 +1,13 @@
 import fs from 'fs';
-import path from 'path';
 import sharp from 'sharp';
-import sizes from '../config/imgSizes';
-import dataSets from '../config/datasets';
-import { maxNodesCount } from '../config/maxNodesCount';
+import sizes from '../config/imgSizes.js';
+import dataSets from '../config/datasets.js';
+import { maxNodesCount } from '../config/maxNodesCount.js';
+import path from 'path';
+import {fileURLToPath} from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const fsp = fs.promises;
 
@@ -50,21 +54,6 @@ const buildDatasets = async (imgSizes) => {
             });
 
             const sourceFiles = Object.values(sortedNodes);
-            // if (fs.existsSync(jsonFilePath)) {
-            //     console.log(`json file already exists for dataset: ${datasetName} - delete the file for recreating the dataset`);
-            //     console.log('dataset will be build from json file');
-            //     const jsonFile = await fsp.readFile(jsonFilePath);
-            //     sourceFiles = JSON.parse(jsonFile);
-            // } else {
-            //     // create json file from #count random pics
-            //     sourceFiles = await fsp.readdir(imgPath);
-            //     sourceFiles.sort(() => Math.random() - 0.5);
-            //     sourceFiles = sourceFiles.slice(0, count);
-            //     await fsp.writeFile(jsonFilePath, JSON.stringify(sourceFiles));
-            //     console.log('create json file for:');
-            //     console.log(datasetName);
-            //     console.log(jsonFilePath);
-            // }
             let wstream;
 
             console.log(`start building dataset for ${count} pics`);

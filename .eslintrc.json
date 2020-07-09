@@ -1,11 +1,4 @@
 {
-  "extends": "airbnb-base",
-
-  "rules": {
-    "indent": ["error", 4],
-    "no-param-reassign": ["error", { "props": true }],
-    "max-len": ["error", {"code": 100, "ignoreComments":  true}]
-  },
   "env": {
     "node": true
   }

@@ -1,6 +1,6 @@
 import fetch from 'node-fetch';
-import { pythonApi } from '../config/pythonApi';
-import { buildLabels } from '../util/buildLabels';
+import { pythonApi } from '../config/pythonApi.js';
+import { buildLabels } from '../util/buildLabels.js';
 
 export default socket => async (data) => {
     console.log('updateEmbedding');

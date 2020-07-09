@@ -78,7 +78,7 @@ const resizeImages = async (imgCount, imgPath) => {
 };
 
 const imgCount = 500;
-const imgPath = path.normalize(path.join(__dirname, '..', 'images/2582_sub_wikiarts/'));
+const imgPath = path.normalize(path.join(__dirname, '..', 'images/2582_sub_wikiarts_debug/'));
 // loadImages(imgCount, imgPath);
 resizeImages(imgCount, imgPath);
 

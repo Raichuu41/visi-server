@@ -2,6 +2,7 @@
   "name": "bachelor-node",
   "version": "1.0.1",
   "private": true,
+  "type": "module",
   "scripts": {
     "start": "node --max-old-space-size=16384 ./dist",
     "dev": "cross-env NODE_ENV=development nodemon --exec babel-node -- ./src",
@@ -24,7 +25,7 @@
     "morgan": "^1.10.0",
     "mysql": "^2.18.1",
     "node-fetch": "^2.6.0",
-    "sharp": "^0.22.1",
+    "sharp": "^0.23.4",
     "socket.io": "^2.3.0",
     "stream-stream": "^1.2.6",
     "supercluster": "^6.0.2",

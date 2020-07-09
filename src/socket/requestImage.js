@@ -1,6 +1,6 @@
 import path from 'path';
 import { promises as fsp } from 'fs';
-import dataSets from '../config/datasets';
+import dataSets from '../config/datasets.js';
 
 export default socket => async (data) => {
     // console.log("requestImage")

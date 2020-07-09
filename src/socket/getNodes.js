@@ -1,16 +1,13 @@
 import fetch from 'node-fetch';
-import { getRandomColor } from '../util/getRandomColor';
-import { buildLabels } from '../util/buildLabels';
-import { pythonApi } from '../config/pythonApi';
-import dataSets from '../config/datasets';
-import { devMode } from '../config/env';
+import { getRandomColor } from '../util/getRandomColor.js';
+import { buildLabels } from '../util/buildLabels.js';
+import { pythonApi } from '../config/pythonApi.js';
+import dataSets from '../config/datasets.js';
+import { devMode } from '../config/env.js';
 
 // on: getNodes
 export default socket => async (data) => {
     console.log('getNodes');
-    // console.log(typeof data)
-    // console.log(data)
-
     const nodes = {}; // the nodes object for mutating differently in dev mode
     let categories = [];
     let time = 0;
@@ -24,13 +21,21 @@ export default socket => async (data) => {
         datasetId, userId, count, init, nodesFromSnapshot,
     } = data;
     console.log({
-        datasetId, userId, count, init, nodesFromSnapshot,
+        datasetId,
+        userId,
+        count,
+        init,
+        nodesFromSnapshot,
     });
     const dataset = dataSets.find(e => e.id === datasetId);
     if (!dataset) {
         // TODO Error handling, maybe a error emit
         console.error('No valid dataset');
-        console.error({ dataset, datasetId, dataSets });
+        console.error({
+            dataset,
+            datasetId,
+            dataSets
+        });
         return socket.emit('Error', { message: 'Invalid datasetId' });
     }
 
@@ -44,11 +49,16 @@ export default socket => async (data) => {
         //     const length = Object.keys(all.nodes).length;
         //     console.log(d.name, length);
         // }));
-
-        const jsonAll = devMode
-            ? require('./../../mock/AwA2_vectors_test.json')
-            : await fetch(`${pythonApi}/getNodes?dataset=${dataset.name}`).then(res => res.json());
-
+        const jsonAll = await fetch(`http://${pythonApi}/getNodes?dataset=${dataset.name}`)
+            .then(res => res.json());
+        /*
+        const dirname = path.resolve();
+        console.log(path.join(dirname, `/images/${dataset.name}.json`));
+        const jsonAll = fs.readFileSync(path.join(dirname, `/images/${dataset.name}.json`), 'utf8', (error, data) =>{
+            return JSON.parse(data);
+        })
+         */
+        console.log(jsonAll);
         const jsonNodes = jsonAll.nodes;
         const keys = Object.keys(jsonNodes);
         console.log(`get #${keys.length} nodes from init`);
@@ -72,13 +82,14 @@ export default socket => async (data) => {
                 }
             });
         } else {
-            Object.keys(nodesFromSnapshot).forEach((i) => {
-                nodes[i] = nodesFromSnapshot[i]
-                if (nodes[i].x > maxX) maxX = nodes[i].x;
-                if (nodes[i].x < minX) minX = nodes[i].x;
-                if (nodes[i].y > maxY) maxY = nodes[i].y;
-                if (nodes[i].y < minY) minY = nodes[i].y;
-            });
+            Object.keys(nodesFromSnapshot)
+                .forEach((i) => {
+                    nodes[i] = nodesFromSnapshot[i];
+                    if (nodes[i].x > maxX) maxX = nodes[i].x;
+                    if (nodes[i].x < minX) minX = nodes[i].x;
+                    if (nodes[i].y > maxY) maxY = nodes[i].y;
+                    if (nodes[i].y < minY) minY = nodes[i].y;
+                });
         }
         rangeX = Math.abs(maxX - minX);
         rangeY = Math.abs(maxY - minY);
@@ -90,10 +101,12 @@ export default socket => async (data) => {
             rangeX,
             rangeY,
         });
-        Object.keys(nodes).forEach((k) => {
-            nodes[k].x = (((nodes[k].x - minX) / rangeX) * 30) - 15;
-            nodes[k].y = (((nodes[k].y - minY) / rangeY) * 30) - 15;
-        });
+        console.log(nodes);
+        Object.keys(nodes)
+            .forEach((k) => {
+                nodes[k].x = (((nodes[k].x - minX) / rangeX) * 30) - 15;
+                nodes[k].y = (((nodes[k].y - minY) / rangeY) * 30) - 15;
+            });
         const diff2 = process.hrtime(time2);
         time = diff2[0] + (diff2[1] / 1e9);
         console.log(`get init nodes from json took ${time} seconds`);
@@ -120,7 +133,6 @@ export default socket => async (data) => {
                 nodes[n].labels.push(Math.random() >= 0.5 ? `${categories[i]}_label_${i}` : null);
             }
         }
-
         // build and sending back labels (- )labels are scanned on server-side)
         socket.emit('updateCategories', { labels: buildLabels(categories, nodes) });
         console.log('updateCategories: labels are send');
@@ -139,33 +151,46 @@ export default socket => async (data) => {
                     nodes,
                     // tripel,
                 }),
-            }).then(async (res) => {
-                if (res.ok) {
-                    try {
-                        const data2 = await res.json();
+            })
+                .then(async (res) => {
+                    if (res.ok) {
+                        try {
+                            const data2 = await res.json();
 
-                        if (data2.categories) categories = data2.categories;
-                        socket.emit('updateCategories', { labels: buildLabels(categories, nodes) });
-                        const diff1 = process.hrtime(time1);
-                        time = diff1[0] + (diff1[1] / 1e9);
-                        if (data2.nodes) socket.emit('updateEmbedding', { nodes: data2.nodes, time });
-                        socket.emit('initPython', data2);
-                    } catch (err) {
-                        // JSON Error here?
-                        console.error('fetch works but response is not working - why?');
-                        console.log(err);
-                        console.log(res);
-                        // socket.emit('sendAllNodes', nodes);
-                        socket.emit('Error', { message: err.message, err, res });
+                            if (data2.categories) categories = data2.categories;
+                            socket.emit('updateCategories', { labels: buildLabels(categories, nodes) });
+                            const diff1 = process.hrtime(time1);
+                            time = diff1[0] + (diff1[1] / 1e9);
+                            if (data2.nodes) {
+                                socket.emit('updateEmbedding', {
+                                    nodes: data2.nodes,
+                                    time
+                                });
+                            }
+                            socket.emit('initPython', data2);
+                        } catch (err) {
+                            // JSON Error here?
+                            console.error('fetch works but response is not working - why?');
+                            console.log(err);
+                            console.log(res);
+                            // socket.emit('sendAllNodes', nodes);
+                            socket.emit('Error', {
+                                message: err.message,
+                                err,
+                                res
+                            });
+                        }
                     }
-                }
-            });
+                });
             // there are only nodes comming back from here
         } catch (err) {
             // todo bedder error handling, return and emit to inform user
             console.error('error - get nodes from python - error');
             console.error(err);
-            socket.emit('Error', { message: 'error - get nodes from python - error', err });
+            socket.emit('Error', {
+                message: 'error - get nodes from python - error',
+                err
+            });
             // todo remove after right loading from file
             // const diffStartSendNodes = process.hrtime(timeStartSendNodes);
             // console.log(`all ${nodeDataLength} nodes send after: ${diffStartSendNodes[0] + (diffStartSendNodes[1] / 1e9)}s`);
@@ -193,202 +218,26 @@ export default socket => async (data) => {
     // const timeStartSendNodes = process.hrtime();
 
     // doing everything for each node and send it back
-    Object.values(nodes).map(async (node) => {
-        // get a unique color for each node as a key
-        while (true) {
-            const colorKey = getRandomColor();
-            if (!colorKeyHash[colorKey]) {
-                node.colorKey = colorKey;
-                colorKeyHash[colorKey] = node;
-                break;
+    Object.values(nodes)
+        .map(async (node) => {
+            // get a unique color for each node as a key
+            while (true) {
+                const colorKey = getRandomColor();
+                if (!colorKeyHash[colorKey]) {
+                    node.colorKey = colorKey;
+                    colorKeyHash[colorKey] = node;
+                    break;
+                }
             }
-        }
 
-        // TODO in Python?
-        if (!node.clique) node.clique = [1, 2, 3];
-        if (!node.rank && node.rank !== 0) node.rank = 0.5;
-    });
+            // TODO in Python?
+            if (!node.clique) node.clique = [1, 2, 3];
+            if (!node.rank && node.rank !== 0) node.rank = 0.5;
+        });
 
     console.log('sendAllNodes');
-    return socket.emit('sendAllNodes', { nodes, time });
+    return socket.emit('sendAllNodes', {
+        nodes,
+        time
+    });
 };
-
-// THE OLD CLUSTERING
-// add default cluster value (max cluster/zooming)
-// Object.values(nodes).forEach(node => node.cluster = nodeDataLength);
-
-// starting the clustering
-// console.log('start clustering');
-// const timeCluster = process.hrtime();
-// const points = Object.values(nodes)
-//     .map((n, i) => {
-//         const point = [n.x, n.y]; // array with properties is ugly!
-//         point.id = i;
-//         point.x = n.x;
-//         point.y = n.y;
-//         return point;
-//     });
-
-// const kdtree = kdbush(points, n => n.x, n => n.y)
-// console.log("finish kdtree")
-
-// const smallBox = kdtree.range(-3, -3, 3, 3)//.map(id => nodes[id])
-// console.log(smallBox)
-// const middlebox = index.range(-10, -10, 10, 10).map(id => nodes[id])
-// const hcCluster = clusterfck.hcluster(points);
-// console.log('finish hccluster');
-//
-// const zoomStages = 20;
-// const nodesPerStage = Math.round(nodeDataLength / zoomStages) || 1; // small #nodes can result to 0
-// // loop trough the zoomstages
-// for (let i = nodesPerStage; i <= nodeDataLength; i += nodesPerStage) {
-//     hcCluster.clusters(i).forEach((cluster) => {
-//         const agentId = cluster[0].id; // first value in cluster is represent
-//         if (nodes[agentId].cluster > i) nodes[agentId].cluster = i;
-//     });
-//     console.log(`Building ${i} clusters finished`);
-// }
-// console.log('finish clusters');
-//
-// const diffCluster = process.hrtime(timeCluster);
-// console.log(`end clustering: ${diffCluster[0] + (diffCluster[1] / 1e9)} seconds`);
-// // clusterStore = nodes;
-// // }
-//
-// /*
-//     CLUSTERING - kmeans performance test
-//  */
-// const points2 = Object.values(nodes)
-//     .map((n, i) => {
-//         const point = [n.x, n.y]; // array with properties is ugly!
-//         return point;
-//     });
-//
-// console.log('start clustering kmeans');
-// console.time('cluster kmeans');
-// const timeCluster2 = process.hrtime();
-
-// const cluster2 = clusterfck.kmeans(points2, 20);
-
-// const diffCluster2 = process.hrtime(timeCluster2);
-// console.timeEnd('cluster kmeans');
-// console.log(`end clustering kmeans: ${diffCluster2[0] + (diffCluster2[1] / 1e9)} seconds`);
-
-/*
-// calc kernel density estimation
-const timeKde = process.hrtime();
-
-
-const x = [];
-const y = [];
-Object.values(nodes).forEach((node) => {
-   x.push(node.x);
-   y.push(node.y);
-});
-
-const out = kde2d(x, y, {
-   xMin: -20,
-   xMax: 20,
-   yMin: -20,
-   yMax: 20,
-   // 'h': [ 0.01, 255 ], // bandwith - schätze damit kann man die range der dichte angeben
-   // 'n': 5 // default 25 - was ist das
-});
-// console.log(out)
-// console.log(out.z)
-
-
-const diffKde = process.hrtime(timeKde);
-console.log(`end kde: ${diffKde[0] + diffKde[1] / 1e9} seconds`);
-*/
-
-// THE OLD IMAGE LOD WAY
-/*
-        node.pics = Object.create(null);
-        // node.url = `/images_3000/${node.name}.jpg`;
-
-        try {
-
-            // new architecture 2
-            if (dataset.reszied) {
-                await Promise.all(imgSizes.map(async (size) => {
-                    const filePath = path.join(imgPath, dataset.name, size.toString(), `${node.name}.png`);
-                    console.log({ filePath });
-                    node.pics[size] = await sharp(filePath)
-                        .raw()
-                        .toBuffer({ resolveWithObject: true })
-                        .catch((e) => {
-                            console.warn(filePath);
-                            throw Error(e);
-                        });
-                }));
-            } else {
-                await Promise.all(imgSizes.map(async (size) => {
-                    const filePath = path.join(dataset.imgPath, `${node.name}.jpg`);
-                    // console.log({ filePath });
-                    node.pics[size] = await sharp(filePath)
-                        .resize(size, size, { fit: 'inside' })
-                        // .png()
-                        .ensureAlpha()
-                        .raw()
-                        .toBuffer({ resolveWithObject: true })
-                        .catch((e) => {
-                            console.log(filePath);
-                            console.log(`exists?: ${fs.existsSync(filePath)}`);
-                            throw Error(e);
-                        });
-                }));
-            }
-
-            // scaledPicsHash[node.name] = node.pics;
-
-            // new archetecture 1
-            /!* await Promise.all(arr.map(async (size) => {
-                        const buffer = await sharp(file)
-                            .resize(size, size)
-                            .max()
-                            .toFormat('jpg')
-                            .toBuffer();
-                        node.pics[size] = `data:image/jpg;base64,${buffer.toString('base64')}`; // save for faster reload TODO test with lots + large image
-                    })); *!/
-            // }
-
-            /!*socket
-                .compress(false) // important - otherwise it's waiting for all nodes
-            // .binary(true)    // todo check what this could be
-                .emit('node', node);
-
-            if ((index + 1) % 100 === 0) {
-                const diffStartSendNodes = process.hrtime(timeStartSendNodes);
-                console.log(`node is send: ${node.name} #${node.index} after: ${diffStartSendNodes[0] + (diffStartSendNodes[1] / 1e9)}s`);
-                // socket.compress(false).emit('nodesCount', node.index);
-            }*!/
-        } catch (err) {
-            console.log('Node was not send cause of missing image - how to handle?');
-            console.error(err);
-            console.log(node.index);
-            console.log(node);
-        } */
-// });
-// )
-
-// .then(() => {
-
-// });
-// console.log(nodes);
-
-// const wstream = fs.createWriteStream(`${dataset.name}_${mockDataLength}.bin`);
-//
-//
-// Object.values(nodes).map(n => Object.values(n.pics).map((p) => {
-//     wstream.write(Buffer.from([p.info.width, p.info.height]));
-//     // wstream.write(p.info.height);
-//     wstream.write(p.data);
-//     console.log(p.info.width, p.info.height, p.data.length);
-// }));
-// wstream.end();
-// wstream.on('finish', () => {
-//     console.log('All writes are now complete.');
-//     console.log(wstream.path)
-// });
-// };

@@ -1,10 +1,10 @@
 import md5 from 'md5';
-import { Router } from 'express';
-import { db } from '../config/db_secret';
+import Router from 'express';
+import db from '../config/db_secret.js';
+import mysql from 'mysql';
 
 const router = Router();
 
-const mysql = require('mysql');
 
 const connection = mysql.createConnection({
     host: db.host,

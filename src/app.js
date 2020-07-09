@@ -3,20 +3,23 @@ import morgan from 'morgan';
 import cors from 'cors';
 import express from 'express';
 import socketIo from 'socket.io';
-import pythonRoute from './routes/python/index';
-import svmRoute from './routes/svm';
-import imgPath from './config/imgPath';
-import dataset from './routes/dataset';
-import snapshots from './routes/snapshots';
-import requestImage from './socket/requestImage';
-import updateEmbedding from './socket/updateEmbedding';
-import getNodes from './socket/getNodes';
-import login from './routes/login';
+import pythonRoute from './routes/python/index.js';
+import svmRoute from './routes/svm/index.js';
+import imgPath from './config/imgPath.js';
+import dataset from './routes/dataset/index.js';
+import snapshots from './routes/snapshots/index.js';
+import requestImage from './socket/requestImage.js';
+import updateEmbedding from './socket/updateEmbedding.js';
+import getNodes from './socket/getNodes.js';
+import login from './routes/login.js';
 
 const app = express();
 
 // Socket.io
-const io = socketIo({ pingTimeout: 4800000, pingInterval: 600000 });
+const io = socketIo({
+    pingTimeout: 4800000,
+    pingInterval: 600000
+});
 app.io = io;
 
 // const scaledPicsHash = {}; // scaled images in new archetecture 2
@@ -33,7 +36,10 @@ app.io = io;
 app.use(bodyParser.urlencoded({ extended: false })) */
 
 app.use(express.json({ limit: '5mb' }));
-app.use(express.urlencoded({ extended: false, limit: '5mb' }));
+app.use(express.urlencoded({
+    extended: false,
+    limit: '5mb'
+}));
 app.use(morgan('dev'));
 app.use(cors());
 
@@ -54,7 +60,7 @@ app.use('/api/v1/snapshots/', snapshots);
 // / catch 404 and forward to error handler
 app.use((req, res, next) => {
     const err = new Error('URL Not Found');
-    console.error(req.path)
+    console.error(req.path);
     err.status = 404;
     next(err);
 });
@@ -94,4 +100,20 @@ io.sockets.on('connection', (socket) => {
     });
 });
 
-module.exports = app;
+const allowedOrigins = ['http://localhost:8000', 'http://localhost:8080'];
+
+app.use(
+    cors({
+        origin: function (origin, callback) {
+            if (!origin) return callback(null, true);
+            if (allowedOrigins.indexOf(origin) === -1) {
+                var msg =
+                    'The CORS policy for this site does not ' +
+                    'allow access from the specified Origin.';
+                return callback(new Error(msg), false);
+            }
+            return callback(null, true);
+        }
+    })
+);
+export default app;
