@@ -1,6 +1,6 @@
 import fs from 'fs';
 import Router from 'express';
-import { dataSet } from '../../config/datasets.js';
+import dataSet from '../../config/datasets.js';
 import ss from 'stream-stream';
 import path from 'path';
 import {fileURLToPath} from 'url';
@@ -45,7 +45,7 @@ router.get('/images/:id/:count', async (req, res, next) => {
             // i = (i + 500) < count ? i + 500 : +count;
             // const fileName = `${name}#${i}.bin`;
             const fileName = `${name}#${i}.bin`;
-            const filePath = path.join(__dirname, '/images/bin/', fileName);
+            const filePath = path.join(__dirname, '../../../images/bin/', fileName);
             const stat = fs.statSync(filePath);
             console.log(i, stat.size, filePath);
             contentSize += stat.size;

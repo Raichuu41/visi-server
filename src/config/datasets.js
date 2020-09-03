@@ -21,15 +21,20 @@ const dataSet = [
         imgPath: path.join(__dirname, '../../images/2582_sub_wikiarts_debug'),
         size: 4,
     },
-/*    {
-        id: '001',
-        name: 'Wikiart_Elgammal_EQ_style_train',
-        description: 'description text missing',
-        imgPath: '/net/hcihome/storage/www-data-login-cv/visiexp/datasets/raw/Wikiart_Elgammal/',
-        size: 6336,
-
-     }
- */
+    {
+        id: '003',
+        name: 'STL_debug',
+        description: '----',
+        imgPath: path.join(__dirname, '../../images/STL_debug'),
+        size: 1300,
+    },
+    {
+        id: '004',
+        name: 'images_3000',
+        description: 'Images 3000 Dataset',
+        imgPath: path.join(__dirname, '../../images/images_3000'),
+        size: 11728,
+    }
 ];
 
 export default dataSet;
