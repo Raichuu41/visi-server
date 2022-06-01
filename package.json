@@ -28,7 +28,7 @@
     "mysql": "^2.18.1",
     "node-fetch": "^2.6.0",
     "request": "^2.88.2",
-    "sharp": "0.25.4",
+    "sharp": "0.30.5",
     "socket.io": "^2.3.0",
     "stream-stream": "^1.2.6",
     "supercluster": "^6.0.2",
